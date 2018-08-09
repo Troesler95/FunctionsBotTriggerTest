@@ -1,0 +1,26 @@
+{
+ "bindings": [
+  {
+   "name": "myQueueItem",
+   "type": "queueTrigger",
+   "direction": "in",
+   "queueName": "bot-queue",
+   "connection": ""
+  },
+  {
+   "type": "bot",
+   "name": "$return",
+   "direction": "out",
+   "botId": "testbot"
+  },
+  {
+   "type": "http",
+   "name": "res",
+   "direction": "out"
+  }
+ ],
+ "_originalEntryPoint": false,
+ "_originalScriptFile": "run.js",
+ "scriptFile": "../.funcpack/index.js",
+ "entryPoint": "ProactiveFunctionToBot"
+}
