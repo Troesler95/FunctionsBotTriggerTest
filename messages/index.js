@@ -38,7 +38,7 @@ bot.on('event', function (message) {
     var queuedMessage = message.value;
     var reply = new builder.Message()
         .address(queuedMessage.address)
-        .text('This is coming from the function: ' + queuedMessage.text);
+        .text("Message.value: " + message.value);
     bot.send(reply);
 });
 
