@@ -34,7 +34,6 @@ bot.set('storage', tableStorage);
 // Intercept event (ActivityTypes.Event)
 bot.on('event', function (message) {
     // handle message from trigger function
-    bot.send(message.value);
     var queuedMessage = message.value;
     var reply = new builder.Message()
         .address(queuedMessage.address)
