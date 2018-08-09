@@ -7,7 +7,7 @@
     "azure-storage": "^2.6.0",
     "botbuilder": "^3.13.1",
     "botbuilder-azure": "3.0.4",
-    "https": "^1.0.0"
+    "request": "^2.87.0"
   },
   "devDependencies": {
     "restify": "^4.3.0"

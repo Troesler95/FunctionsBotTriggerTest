@@ -7,7 +7,7 @@ var builder = require("botbuilder");
 var botbuilder_azure = require("botbuilder-azure");
 var azure = require('azure-storage');
 var path = require('path');
-var https = require('https');
+var request = require('request');
 
 var useEmulator = (process.env.NODE_ENV == 'development');
 
@@ -43,34 +43,23 @@ bot.on('event', function (message) {
 
 // Handle message from user
 bot.dialog('/', function (session) {
-    var queuedMessage = { address: session.message.address, text: session.message.text };
-    session.userData.msgText = session.message.text;
-    session.userData.msgAddress = session.message.address;
-    // add message to queue
+    var messageDetails = { address: session.message.address, text: session.message.text };
+
     session.sendTyping();
-    session.send('Your message (\'' + session.message.text + '\') is being added to a queue, and it will be ' +
-        'sent back to you via a Function shortly after.');
-    var queueSvc = azure.createQueueService(process.env.AzureWebJobsStorage);
-    queueSvc.createQueueIfNotExists('bot-queue', function(err, result, response){
-        if(!err){
-            // Add the message to the queue
-            var queueMessageBuffer = new Buffer(JSON.stringify(queuedMessage)).toString('base64');
-            queueSvc.createMessage('bot-queue', queueMessageBuffer, function(err, result, response){
-                if(err){
-                    // this should be a log for the dev, not a message to the user
-                    session.send('There was an error inserting your message into queue');
-                }
-            });
-        } else {
-            // this should be a log for the dev, not a message to the user
-            session.send('There was an error creating your queue');
+    session.send('Your message (\'' + session.message.text + '\') is being POSTed to the function trigger, and it will be ' +
+        'sent back to you via a Function shortly after!');
+
+    request.post({
+        url: "https://proativetriggerfuncbot.azurewebsites.net/api/EndpointTrigger",
+        json: true,
+        body: messageDetails,
+    }, (err, res, body) => {
+        if(res.statusCode != 200) {
+            session.send("There was an error POSTing to the trigger!");
+            session.send("Error: " + err.Message);
         }
     });
 
-    https.post('https://proativetriggerfuncbot.azurewebsites.net/api/EndpointTrigger').on("error", (err) => {
-        session.send("There was an error sending the get request to the trigger!");
-        session.send("Error: " + err.Message);
-    });
     session.send("Sent POST request to HTTP trigger!");
 });
 
