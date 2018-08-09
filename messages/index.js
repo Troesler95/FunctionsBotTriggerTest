@@ -7,6 +7,7 @@ var builder = require("botbuilder");
 var botbuilder_azure = require("botbuilder-azure");
 var azure = require('azure-storage');
 var path = require('path');
+var https = require('https');
 
 var useEmulator = (process.env.NODE_ENV == 'development');
 
@@ -43,9 +44,12 @@ bot.on('event', function (message) {
 // Handle message from user
 bot.dialog('/', function (session) {
     var queuedMessage = { address: session.message.address, text: session.message.text };
+    session.userData.msgText = session.message.text;
+    session.userData.msgAddress = session.message.address;
     // add message to queue
     session.sendTyping();
-    session.send('Your message (\'' + session.message.text + '\') is being added to a queue, and it will be sent back to you via a Function shortly after.');
+    session.send('Your message (\'' + session.message.text + '\') is being added to a queue, and it will be ' +
+        'sent back to you via a Function shortly after.');
     var queueSvc = azure.createQueueService(process.env.AzureWebJobsStorage);
     queueSvc.createQueueIfNotExists('bot-queue', function(err, result, response){
         if(!err){
@@ -63,6 +67,11 @@ bot.dialog('/', function (session) {
         }
     });
 
+    https.get('https://proativetriggerfuncbot.azurewebsites.net/api/EndpointTrigger').on("error", (err) => {
+        session.send("There was an error sending the get request to the trigger!");
+        session.send("Error: " + err.Message);
+    });
+    session.send("Sent GET request to HTTP trigger!");
 });
 
 if (useEmulator) {
