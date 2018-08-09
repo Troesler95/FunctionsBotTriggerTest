@@ -22,22 +22,21 @@ var connector = useEmulator ? new builder.ChatConnector() : new botbuilder_azure
 * We provide adapters for Azure Table, CosmosDb, SQL Azure, or you can implement your own!
 * For samples and documentation, see: https://github.com/Microsoft/BotBuilder-Azure
 * ---------------------------------------------------------------------------------------- */
-
-var tableName = 'botdata';
-var azureTableClient = new botbuilder_azure.AzureTableClient(tableName, process.env['AzureWebJobsStorage']);
-var tableStorage = new botbuilder_azure.AzureBotStorage({ gzipData: false }, azureTableClient);
+var inMemory = new builder.MemoryBotStorage();
 
 var bot = new builder.UniversalBot(connector);
 bot.localePath(path.join(__dirname, './locale'));
-bot.set('storage', tableStorage);
+bot.set('storage', inMemory);
 
 // Intercept event (ActivityTypes.Event)
+// This is where the event from the HTTP trigger is "caught"
+// message contains the payload returned from the HTTP trigger function's context.done() call
 bot.on('event', function (message) {
     // handle message from trigger function
-    var queuedMessage = message.value;
+    var returnedMessage = message.value;
     var reply = new builder.Message()
-        .address(queuedMessage.address)
-        .text("Message.value: " + message.value);
+        .address(returnedMessage.address)
+        .text("The message you sent was: " + returnedMessage.text);
     bot.send(reply);
 });
 
