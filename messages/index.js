@@ -67,11 +67,11 @@ bot.dialog('/', function (session) {
         }
     });
 
-    https.get('https://proativetriggerfuncbot.azurewebsites.net/api/EndpointTrigger').on("error", (err) => {
+    https.post('https://proativetriggerfuncbot.azurewebsites.net/api/EndpointTrigger').on("error", (err) => {
         session.send("There was an error sending the get request to the trigger!");
         session.send("Error: " + err.Message);
     });
-    session.send("Sent GET request to HTTP trigger!");
+    session.send("Sent POST request to HTTP trigger!");
 });
 
 if (useEmulator) {
